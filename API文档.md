@@ -1044,6 +1044,114 @@ const (
 
 ---
 
+### 3.10 类型转换方法
+
+#### RectToVariant
+**功能描述**：将矩形结构转换为VARIANT类型。
+
+**函数签名**：
+```go
+func (v *IUIAutomation) RectToVariant(in *TagRect) (*VARIANT, error)
+```
+
+**参数说明**：
+- `in`：矩形结构 `TagRect{Left, Top, Right, Bottom}`
+
+**返回值**：
+- `*VARIANT`：转换后的VARIANT
+- `error`：错误信息
+
+---
+
+#### VariantToRect
+**功能描述**：将VARIANT转换为矩形结构。
+
+**函数签名**：
+```go
+func (v *IUIAutomation) VariantToRect(in *VARIANT) (*TagRect, error)
+```
+
+**参数说明**：
+- `in`：VARIANT类型
+
+**返回值**：
+- `*TagRect`：矩形结构
+- `error`：错误信息
+
+---
+
+#### IntNativeArrayToSafeArray
+**功能描述**：将整数原生数组转换为安全数组。
+
+**函数签名**：
+```go
+func (v *IUIAutomation) IntNativeArrayToSafeArray(in, in2 int32) (*TagSafeArray, error)
+```
+
+**参数说明**：
+- `in`：整数数组指针
+- `in2`：数组长度
+
+**返回值**：
+- `*TagSafeArray`：安全数组
+- `error`：错误信息
+
+---
+
+#### IntSafeArrayToNativeArray
+**功能描述**：将安全数组转换为整数原生数组。
+
+**函数签名**：
+```go
+func (v *IUIAutomation) IntSafeArrayToNativeArray(in *TagSafeArray) (int32, int32, error)
+```
+
+**参数说明**：
+- `in`：安全数组
+
+**返回值**：
+- `int32`：数组指针
+- `int32`：数组长度
+- `error`：错误信息
+
+---
+
+#### PollForPotentialSupportedPatterns
+**功能描述**：轮询元素潜在支持的模式。
+
+**函数签名**：
+```go
+func (v *IUIAutomation) PollForPotentialSupportedPatterns(in *IUIAutomationElement) (*TagSafeArray, *TagSafeArray, error)
+```
+
+**参数说明**：
+- `in`：UI元素
+
+**返回值**：
+- `*TagSafeArray`：模式ID数组
+- `*TagSafeArray`：模式名称数组
+- `error`：错误信息
+
+---
+
+#### PollForPotentialSupportedProperties
+**功能描述**：轮询元素潜在支持的属性。
+
+**函数签名**：
+```go
+func (v *IUIAutomation) PollForPotentialSupportedProperties(in *IUIAutomationElement) (*TagSafeArray, *TagSafeArray, error)
+```
+
+**参数说明**：
+- `in`：UI元素
+
+**返回值**：
+- `*TagSafeArray`：属性ID数组
+- `*TagSafeArray`：属性名称数组
+- `error`：错误信息
+
+---
+
 ## 十、完整使用示例
 
 ### 10.1 记事本自动化
@@ -1243,6 +1351,95 @@ func main() {
     }
 }
 ```
+
+---
+
+### 10.6 微信自动化示例
+**功能描述**：自动选择联系人并发送消息。
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+    "time"
+    uia "github.com/auuunya/go-element"
+)
+
+func main() {
+    // 初始化COM
+    uia.CoInitialize()
+    defer uia.CoUninitialize()
+
+    // 查找微信窗口
+    hwnd, err := uia.GetWindowForString("WeChatMainWndForPC", "")
+    if err != nil {
+        log.Fatal("未找到微信窗口，请先打开微信")
+    }
+
+    // 创建IUIAutomation实例
+    instance, err := uia.CreateInstance(
+        uia.CLSID_CUIAutomation,
+        uia.IID_IUIAutomation,
+        uia.CLSCTX_ALL,
+    )
+    if err != nil {
+        log.Fatal("创建实例失败:", err)
+    }
+    ppv := uia.NewIUIAutomation(uia.NewIUnKnown(instance))
+    defer ppv.Release()
+
+    // 从窗口句柄获取元素
+    root, err := ppv.ElementFromHandle(hwnd)
+    if err != nil {
+        log.Fatal("获取元素失败:", err)
+    }
+    defer root.Release()
+
+    // 遍历UI树
+    tree := uia.TraverseUIElementTree(ppv, root)
+
+    // 1. 在搜索框输入联系人名称
+    if searchBox := tree.FindByName("搜索"); searchBox != nil {
+        if vp, err := searchBox.GetValuePattern(); err == nil {
+            defer vp.Release()
+            vp.SetValue("文件传输助手")
+            time.Sleep(500 * time.Millisecond) // 等待搜索结果
+        }
+    }
+
+    // 2. 重新遍历获取搜索结果
+    tree = uia.TraverseUIElementTree(ppv, root)
+
+    // 3. 查找并点击联系人（精确匹配）
+    if contact := tree.FindByName("文件传输助手"); contact != nil {
+        if ip, err := contact.GetInvokePattern(); err == nil {
+            defer ip.Release()
+            ip.Invoke() // 点击联系人
+            time.Sleep(300 * time.Millisecond)
+        }
+    }
+
+    // 4. 重新遍历获取聊天窗口
+    tree = uia.TraverseUIElementTree(ppv, root)
+
+    // 5. 在消息输入框输入文本
+    if inputBox := tree.FindByAutomationId("chat_input_field"); inputBox != nil {
+        if vp, err := inputBox.GetValuePattern(); err == nil {
+            defer vp.Release()
+            vp.SetValue("这是来自 go-element 的自动消息！")
+            fmt.Println("消息已输入")
+        }
+    }
+}
+```
+
+**注意事项**：
+- 微信窗口类名为 `WeChatMainWndForPC`
+- 搜索框和输入框需要使用 ValuePattern
+- 联系人点击需要使用 InvokePattern
+- 操作之间需要适当延时等待UI更新
 
 ---
 
