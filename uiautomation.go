@@ -828,6 +828,10 @@ func (v *IUIAutomation) PollForPotentialSupportedProperties(in *IUIAutomationEle
 	}
 	return retVal, retVal2, nil
 }
+
+// RectToVariant 将矩形转换为 VARIANT
+// 参数: in - 矩形结构
+// 返回: VARIANT 和可能的错误
 func (v *IUIAutomation) RectToVariant(in *TagRect) (*VARIANT, error) {
 	var retVal *VARIANT
 	ret, _, _ := syscall.SyscallN(
@@ -841,6 +845,9 @@ func (v *IUIAutomation) RectToVariant(in *TagRect) (*VARIANT, error) {
 	}
 	return retVal, nil
 }
+
+// RemoveAllEventHandlers 移除所有事件处理器
+// 返回: 错误信息
 func (v *IUIAutomation) RemoveAllEventHandlers() error {
 	ret, _, _ := syscall.SyscallN(
 		(*IUIAutomationVtbl)(unsafe.Pointer(v.vtbl)).RemoveAllEventHandlers,
@@ -851,6 +858,14 @@ func (v *IUIAutomation) RemoveAllEventHandlers() error {
 	}
 	return nil
 }
+
+// RemoveAutomationEventHandler 移除自动化事件处理器
+// 参数:
+//   - in: 事件ID
+//   - in2: UI 元素
+//   - in3: 事件处理器
+//
+// 返回: 错误信息
 func (v *IUIAutomation) RemoveAutomationEventHandler(in UIA_EventId, in2 *IUIAutomationElement, in3 *IUIAutomationEventHandler) error {
 	ret, _, _ := syscall.SyscallN(
 		(*IUIAutomationVtbl)(unsafe.Pointer(v.vtbl)).RemoveAutomationEventHandler,
@@ -864,6 +879,10 @@ func (v *IUIAutomation) RemoveAutomationEventHandler(in UIA_EventId, in2 *IUIAut
 	}
 	return nil
 }
+
+// RemoveFocusChangedEventHandler 移除焦点变更事件处理器
+// 参数: in - 焦点变更事件处理器
+// 返回: 错误信息
 func (v *IUIAutomation) RemoveFocusChangedEventHandler(in *IUIAutomationFocusChangedEventHandler) error {
 	ret, _, _ := syscall.SyscallN(
 		(*IUIAutomationVtbl)(unsafe.Pointer(v.vtbl)).RemoveFocusChangedEventHandler,
@@ -895,6 +914,13 @@ func (v *IUIAutomation) RemovePropertyChangedEventHandler(in *IUIAutomationEleme
 	}
 	return nil
 }
+
+// RemoveStructureChangedEventHandler 移除结构变更事件处理器
+// 参数:
+//   - in: UI 元素
+//   - in2: 结构变更事件处理器
+//
+// 返回: 错误信息
 func (v *IUIAutomation) RemoveStructureChangedEventHandler(in *IUIAutomationElement, in2 *IUIAutomationStructureChangedEventHandler) error {
 	ret, _, _ := syscall.SyscallN(
 		(*IUIAutomationVtbl)(unsafe.Pointer(v.vtbl)).RemoveStructureChangedEventHandler,
@@ -907,6 +933,10 @@ func (v *IUIAutomation) RemoveStructureChangedEventHandler(in *IUIAutomationElem
 	}
 	return nil
 }
+
+// SafeArrayToRectNativeArray 将安全数组转换为矩形原生数组
+// 参数: in - 安全数组
+// 返回: 矩形数组指针、数组长度和可能的错误
 func (v *IUIAutomation) SafeArrayToRectNativeArray(in *TagSafeArray) (*TagRect, int32, error) {
 	var retVal *TagRect
 	var retVal2 int32
@@ -922,6 +952,10 @@ func (v *IUIAutomation) SafeArrayToRectNativeArray(in *TagSafeArray) (*TagRect, 
 	}
 	return retVal, retVal2, nil
 }
+
+// VariantToRect 将 VARIANT 转换为矩形
+// 参数: in - VARIANT
+// 返回: 矩形结构和可能的错误
 func (v *IUIAutomation) VariantToRect(in *VARIANT) (*TagRect, error) {
 	var retVal *TagRect
 	ret, _, _ := syscall.SyscallN(
@@ -936,6 +970,12 @@ func (v *IUIAutomation) VariantToRect(in *VARIANT) (*TagRect, error) {
 	return retVal, nil
 }
 
+// ElementFromHandle 从窗口句柄获取元素（辅助函数）
+// 参数:
+//   - v: UI Automation 接口
+//   - hwnd: 窗口句柄
+//
+// 返回: UI 元素和可能的错误
 func ElementFromHandle(v *IUIAutomation, hwnd uintptr) (*IUIAutomationElement, error) {
 	var retVal *IUIAutomationElement
 	ret, _, _ := syscall.SyscallN(
@@ -950,6 +990,9 @@ func ElementFromHandle(v *IUIAutomation, hwnd uintptr) (*IUIAutomationElement, e
 	return retVal, nil
 }
 
+// CreateTrueCondition 创建真条件（辅助函数）
+// 参数: v - UI Automation 接口
+// 返回: 条件接口
 func CreateTrueCondition(v *IUIAutomation) *IUIAutomationCondition {
 	var retVal *IUIAutomationCondition
 	syscall.SyscallN(
@@ -960,29 +1003,34 @@ func CreateTrueCondition(v *IUIAutomation) *IUIAutomationCondition {
 	return retVal
 }
 
+// IUIAutomationElement UI Automation 元素接口
+// 代表 UI 树中的一个元素，可以是窗口、按钮、文本框等
 type IUIAutomationElement struct {
 	vtbl *IUnKnown
 }
 
+// Release 释放 UI 元素对象
+// 返回: 引用计数
 func (v *IUIAutomationElement) Release() uint32 {
 	return (*IUnKnown)(unsafe.Pointer(v)).Release()
 }
 
+// IUIAutomationElementVtbl UI Automation 元素接口虚函数表
 type IUIAutomationElementVtbl struct {
 	IUnKnownVtbl
 
-	SetFocus                        uintptr
-	GetRuntimeId                    uintptr
-	FindFirst                       uintptr
-	FindAll                         uintptr
-	FindFirstBuildCache             uintptr
-	FindAllBuildCache               uintptr
-	BuildUpdatedCache               uintptr
-	GetCurrentPropertyValue         uintptr
-	GetCurrentPropertyValueEx       uintptr
-	GetCachedPropertyValue          uintptr
-	GetCachedPropertyValueEx        uintptr
-	GetCurrentPatternAs             uintptr
+	SetFocus                        uintptr // 设置焦点
+	GetRuntimeId                    uintptr // 获取运行时ID
+	FindFirst                       uintptr // 查找第一个匹配元素
+	FindAll                         uintptr // 查找所有匹配元素
+	FindFirstBuildCache             uintptr // 查找第一个匹配元素并构建缓存
+	FindAllBuildCache               uintptr // 查找所有匹配元素并构建缓存
+	BuildUpdatedCache               uintptr // 构建更新缓存
+	GetCurrentPropertyValue         uintptr // 获取当前属性值
+	GetCurrentPropertyValueEx       uintptr // 获取当前属性值（扩展）
+	GetCachedPropertyValue          uintptr // 获取缓存属性值
+	GetCachedPropertyValueEx        uintptr // 获取缓存属性值（扩展）
+	GetCurrentPatternAs             uintptr // 获取当前模式
 	GetCachedPatternAs              uintptr
 	GetCurrentPattern               uintptr
 	GetCachedPattern                uintptr
