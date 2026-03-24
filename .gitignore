@@ -1,3 +1,16 @@
 _.go
 .DS_Store
 cmd.go
+
+# 编译产物
+*.exe
+*.exe~
+
+# 日志文件
+*.log
+
+# IDE 配置
+.idea/
+.vscode/
+*.swp
+*.swo
