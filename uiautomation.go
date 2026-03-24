@@ -139,12 +139,13 @@ func (v *IUIAutomation) AddFocusChangedEventHandler(in *IUIAutomationCacheReques
 }
 
 // ChangeEventHandler 属性变更事件处理器配置
+// 注意: IUIAutomationPropertyChangedEventHandler 类型未定义，暂时使用 IUnKnown
 type ChangeEventHandler struct {
-	Element       *IUIAutomationElement                     // 目标元素
-	Scope         TreeScope                                 // 搜索范围
-	CacheRequest  *IUIAutomationCacheRequest                // 缓存请求
-	Handler       *IUIAutomationPropertyChangedEventHandler // 事件处理器
-	PropertyArray *TagSafeArray                             // 属性数组
+	Element       *IUIAutomationElement      // 目标元素
+	Scope         TreeScope                  // 搜索范围
+	CacheRequest  *IUIAutomationCacheRequest // 缓存请求
+	Handler       *IUnKnown                  // 事件处理器（原为 IUIAutomationPropertyChangedEventHandler）
+	PropertyArray *TagSafeArray              // 属性数组
 }
 
 // AddPropertyChangedEventHandler 添加属性变更事件处理器
@@ -167,13 +168,14 @@ func (v *IUIAutomation) AddPropertyChangedEventHandler(opt *ChangeEventHandler) 
 }
 
 // ChangeEventHandlerNativeArray 属性变更事件处理器配置（原生数组版本）
+// 注意: IUIAutomationPropertyChangedEventHandler 类型未定义，暂时使用 IUnKnown
 type ChangeEventHandlerNativeArray struct {
-	Element       *IUIAutomationElement                     // 目标元素
-	Scope         TreeScope                                 // 搜索范围
-	CacheRequest  *IUIAutomationCacheRequest                // 缓存请求
-	Handler       *IUIAutomationPropertyChangedEventHandler // 事件处理器
-	PropertyArray *TagSafeArray                             // 属性数组
-	PropertyCount int32                                     // 属性数量
+	Element       *IUIAutomationElement      // 目标元素
+	Scope         TreeScope                  // 搜索范围
+	CacheRequest  *IUIAutomationCacheRequest // 缓存请求
+	Handler       *IUnKnown                  // 事件处理器（原为 IUIAutomationPropertyChangedEventHandler）
+	PropertyArray *TagSafeArray              // 属性数组
+	PropertyCount int32                      // 属性数量
 }
 
 // AddPropertyChangedEventHandlerNativeArray 添加属性变更事件处理器（原生数组版本）
@@ -197,11 +199,12 @@ func (v *IUIAutomation) AddPropertyChangedEventHandlerNativeArray(opt *ChangeEve
 }
 
 // StructureChangedEventHandler 结构变更事件处理器配置
+// 注意: IUIAutomationPropertyChangedEventHandler 类型未定义，暂时使用 IUnKnown
 type StructureChangedEventHandler struct {
-	Element      *IUIAutomationElement                     // 目标元素
-	Scope        TreeScope                                 // 搜索范围
-	CacheRequest *IUIAutomationCacheRequest                // 缓存请求
-	Handler      *IUIAutomationPropertyChangedEventHandler // 事件处理器
+	Element      *IUIAutomationElement      // 目标元素
+	Scope        TreeScope                  // 搜索范围
+	CacheRequest *IUIAutomationCacheRequest // 缓存请求
+	Handler      *IUnKnown                  // 事件处理器（原为 IUIAutomationPropertyChangedEventHandler）
 }
 
 // AddStructureChangedEventHandler 添加结构变更事件处理器
@@ -730,6 +733,10 @@ func (v *IUIAutomation) GetRootElement() (*IUIAutomationElement, error) {
 	}
 	return retVal, nil
 }
+
+// GetRootElementBuildCache 获取带缓存的桌面根元素
+// 参数: in - 缓存请求
+// 返回: 根元素和可能的错误
 func (v *IUIAutomation) GetRootElementBuildCache(in *IUIAutomationCacheRequest) (*IUIAutomationElement, error) {
 	var retVal *IUIAutomationElement
 	ret, _, _ := syscall.SyscallN(
@@ -743,6 +750,13 @@ func (v *IUIAutomation) GetRootElementBuildCache(in *IUIAutomationCacheRequest) 
 	}
 	return retVal, nil
 }
+
+// IntNativeArrayToSafeArray 将整数数组转换为安全数组
+// 参数:
+//   - in: 整数数组
+//   - in2: 数组长度
+//
+// 返回: 安全数组和可能的错误
 func (v *IUIAutomation) IntNativeArrayToSafeArray(in, in2 int32) (*TagSafeArray, error) {
 	var retVal *TagSafeArray
 	ret, _, _ := syscall.SyscallN(
@@ -757,6 +771,10 @@ func (v *IUIAutomation) IntNativeArrayToSafeArray(in, in2 int32) (*TagSafeArray,
 	}
 	return retVal, nil
 }
+
+// IntSafeArrayToNativeArray 将安全数组转换为整数数组
+// 参数: in - 安全数组
+// 返回: 数组指针、数组长度和可能的错误
 func (v *IUIAutomation) IntSafeArrayToNativeArray(in *TagSafeArray) (int32, int32, error) {
 	var retVal int32
 	var retVal2 int32
@@ -772,6 +790,10 @@ func (v *IUIAutomation) IntSafeArrayToNativeArray(in *TagSafeArray) (int32, int3
 	}
 	return retVal, retVal2, nil
 }
+
+// PollForPotentialSupportedPatterns 轮询潜在支持的模式
+// 参数: in - UI 元素
+// 返回: 模式ID数组、模式名称数组和可能的错误
 func (v *IUIAutomation) PollForPotentialSupportedPatterns(in *IUIAutomationElement) (*TagSafeArray, *TagSafeArray, error) {
 	var retVal *TagSafeArray
 	var retVal2 *TagSafeArray
@@ -787,6 +809,10 @@ func (v *IUIAutomation) PollForPotentialSupportedPatterns(in *IUIAutomationEleme
 	}
 	return retVal, retVal2, nil
 }
+
+// PollForPotentialSupportedProperties 轮询潜在支持的属性
+// 参数: in - UI 元素
+// 返回: 属性ID数组、属性名称数组和可能的错误
 func (v *IUIAutomation) PollForPotentialSupportedProperties(in *IUIAutomationElement) (*TagSafeArray, *TagSafeArray, error) {
 	var retVal *TagSafeArray
 	var retVal2 *TagSafeArray
@@ -849,7 +875,15 @@ func (v *IUIAutomation) RemoveFocusChangedEventHandler(in *IUIAutomationFocusCha
 	}
 	return nil
 }
-func (v *IUIAutomation) RemovePropertyChangedEventHandler(in *IUIAutomationElement, in2 *IUIAutomationPropertyChangedEventHandler) error {
+
+// RemovePropertyChangedEventHandler 移除属性变更事件处理器
+// 参数:
+//   - in: UI 元素
+//   - in2: 事件处理器
+//
+// 返回: 错误信息
+// 注意: IUIAutomationPropertyChangedEventHandler 类型未定义，暂时使用 IUnKnown
+func (v *IUIAutomation) RemovePropertyChangedEventHandler(in *IUIAutomationElement, in2 *IUnKnown) error {
 	ret, _, _ := syscall.SyscallN(
 		(*IUIAutomationVtbl)(unsafe.Pointer(v.vtbl)).RemovePropertyChangedEventHandler,
 		uintptr(unsafe.Pointer(v)),

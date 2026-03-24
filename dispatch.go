@@ -1,3 +1,4 @@
+// Package uiautomation 提供 Windows UI Automation 的 Go 语言封装
 package uiautomation
 
 import (
@@ -5,22 +6,36 @@ import (
 	"unsafe"
 )
 
+// IDispatch 调度接口
+// COM 中的标准接口，用于支持动态调用和自动化
 type IDispatch struct {
 	vtbl *IUnKnown
 }
 
+// Release 释放调度接口对象
+// 返回: 引用计数
 func (v *IDispatch) Release() uint32 {
 	return (*IUnKnown)(unsafe.Pointer(v)).Release()
 }
 
+// IDispatchVtbl 调度接口虚函数表
 type IDispatchVtbl struct {
 	IUnKnownVtbl
-	GetIDsOfNames    uintptr
-	GetTypeInfo      uintptr
-	GetTypeInfoCount uintptr
-	Invoke           uintptr
+	GetIDsOfNames    uintptr // 获取名称ID
+	GetTypeInfo      uintptr // 获取类型信息
+	GetTypeInfoCount uintptr // 获取类型信息数量
+	Invoke           uintptr // 调用方法
 }
 
+// GetIDsOfNames 获取方法或属性的名称ID
+// 参数:
+//   - v: IDispatch 接口
+//   - in: GUID
+//   - in2: 名称数量
+//   - in3: 区域设置ID
+//   - in4: 名称数组
+//
+// 返回: 名称ID和可能的错误
 func GetIDsOfNames(v *IDispatch, in *syscall.GUID, in2 uint16, in3, in4 uint32) (int32, error) {
 	var retVal int32
 	ret, _, _ := syscall.SyscallN(
@@ -38,6 +53,15 @@ func GetIDsOfNames(v *IDispatch, in *syscall.GUID, in2 uint16, in3, in4 uint32) 
 	return retVal, nil
 }
 
+// GetTypeInfo 获取类型信息
+// 参数:
+//   - v: IDispatch 接口
+//   - in: 类型信息索引
+//   - in2: 区域设置ID
+//
+// 返回: 类型信息接口和可能的错误
+// 注意: ITypeInfo 类型未定义，此函数暂时注释
+/*
 func GetTypeInfo(v *IDispatch, in, in2 uint32) (*ITypeInfo, error) {
 	var retVal *ITypeInfo
 	ret, _, _ := syscall.SyscallN(
@@ -52,343 +76,4 @@ func GetTypeInfo(v *IDispatch, in, in2 uint32) (*ITypeInfo, error) {
 	}
 	return retVal, nil
 }
-
-func GetTypeInfoCount(v *IDispatch) (uint32, error) {
-	var retVal uint32
-	ret, _, _ := syscall.SyscallN(
-		(*IDispatchVtbl)(unsafe.Pointer(v.vtbl)).GetTypeInfoCount,
-		uintptr(unsafe.Pointer(v)),
-		uintptr(unsafe.Pointer(&retVal)),
-	)
-	if ret != 0 {
-		return 0, HResult(ret)
-	}
-	return retVal, nil
-}
-
-type InvokeReq struct {
-	DispIdMember int32
-	Riid         syscall.GUID
-	LcId         uint32
-	WFlags       uint16
-	PDispParams  *TagDispParams
-}
-type InvokeResp struct {
-	PDispParams *TagDispParams
-	PVarResult  *VARIANT
-	PExcepInfo  *TagExcepInfo
-	PuArgErr    uint32
-}
-
-func Invoke(v *IDispatch, opt *InvokeReq) (*InvokeResp, error) {
-	var resp InvokeResp
-	var pExcepInfo TagExcepInfo
-	var puArgErr uint32
-	ret, _, _ := syscall.SyscallN(
-		(*IDispatchVtbl)(unsafe.Pointer(v.vtbl)).Invoke,
-		uintptr(unsafe.Pointer(v)),
-		uintptr(opt.DispIdMember),
-		uintptr(unsafe.Pointer(&opt.Riid)),
-		uintptr(opt.LcId),
-		uintptr(opt.WFlags),
-		uintptr(unsafe.Pointer(opt.PDispParams)),
-		uintptr(0), // pVarResult
-		uintptr(unsafe.Pointer(&pExcepInfo)),
-		uintptr(unsafe.Pointer(&puArgErr)),
-	)
-	if ret != 0 {
-		return nil, HResult(ret)
-	}
-	resp.PExcepInfo = &pExcepInfo
-	resp.PuArgErr = puArgErr
-	return &resp, nil
-}
-
-type ITypeInfo struct {
-	vtbl *IUnKnown
-}
-
-func (v *ITypeInfo) Release() uint32 {
-	return (*IUnKnown)(unsafe.Pointer(v)).Release()
-}
-
-type ITypeInfoVtbl struct {
-	IUnKnownVtbl
-	AddressOfMember      uintptr
-	CreateInstance       uintptr
-	GetContainingTypeLib uintptr
-	GetDllEntry          uintptr
-	GetDocumentation     uintptr
-	GetFuncDesc          uintptr
-	GetIDsOfNames        uintptr
-	GetImplTypeFlags     uintptr
-	GetMops              uintptr
-	GetNames             uintptr
-	GetRefTypeInfo       uintptr
-	GetRefTypeOfImplType uintptr
-	GetTypeAttr          uintptr
-	GetTypeComp          uintptr
-	GetVarDesc           uintptr
-	Invoke               uintptr
-	ReleaseFuncDesc      uintptr
-	ReleaseTypeAttr      uintptr
-	ReleaseVarDesc       uintptr
-}
-
-// TODO:: ITypeInfo method
-func newITypeInfo(unk *IUnKnown) *ITypeInfo {
-	return (*ITypeInfo)(unsafe.Pointer(unk))
-}
-func NewITypeInfo(unk *IUnKnown) *ITypeInfo {
-	return newITypeInfo(unk)
-}
-func (v *ITypeInfo) AddressOfMember(in int32, in2 TagInvokeKind) (unsafe.Pointer, error) {
-	var retVal unsafe.Pointer
-	ret, _, _ := syscall.SyscallN(
-		(*ITypeInfoVtbl)(unsafe.Pointer(v.vtbl)).AddressOfMember,
-		uintptr(unsafe.Pointer(v)),
-		uintptr(in),
-		uintptr(in2),
-		uintptr(unsafe.Pointer(&retVal)),
-	)
-	if ret != 0 {
-		return nil, HResult(ret)
-	}
-	return retVal, nil
-}
-func (v *ITypeInfo) CreateInstance(in *IUnKnown, in2 *syscall.GUID) (unsafe.Pointer, error) {
-	var retVal unsafe.Pointer
-	ret, _, _ := syscall.SyscallN(
-		(*ITypeInfoVtbl)(unsafe.Pointer(v.vtbl)).CreateInstance,
-		uintptr(unsafe.Pointer(v)),
-		uintptr(unsafe.Pointer(in)),
-		uintptr(unsafe.Pointer(in2)),
-		uintptr(unsafe.Pointer(&retVal)),
-	)
-	if ret != 0 {
-		return nil, HResult(ret)
-	}
-	return retVal, nil
-}
-func (v *ITypeInfo) GetContainingTypeLib() (*ITypeLib, int32, error) {
-	var retVal *ITypeLib
-	var retVal2 int32
-	ret, _, _ := syscall.SyscallN(
-		(*ITypeInfoVtbl)(unsafe.Pointer(v.vtbl)).GetContainingTypeLib,
-		uintptr(unsafe.Pointer(v)),
-		uintptr(unsafe.Pointer(&retVal)),
-		uintptr(unsafe.Pointer(&retVal2)),
-	)
-	if ret != 0 {
-		return nil, -1, HResult(ret)
-	}
-	return retVal, retVal2, nil
-}
-func (v *ITypeInfo) GetDllEntry(in int32, in2 TagInvokeKind) (string, string, uint16, error) {
-	var bstr uintptr
-	var bstr2 uintptr
-	var retVal3 uint16
-	ret, _, _ := syscall.SyscallN(
-		(*ITypeInfoVtbl)(unsafe.Pointer(v.vtbl)).GetDllEntry,
-		uintptr(unsafe.Pointer(v)),
-		uintptr(in),
-		uintptr(in2),
-		uintptr(unsafe.Pointer(&bstr)),
-		uintptr(unsafe.Pointer(&bstr2)),
-		uintptr(unsafe.Pointer(&retVal3)),
-	)
-	if ret != 0 {
-		return "", "", 0, HResult(ret)
-	}
-	var retVal string
-	var retVal2 string
-	if bstr != 0 {
-		retVal = bstr2str(bstr)
-		procSysFreeString.Call(bstr)
-	}
-	if bstr2 != 0 {
-		retVal2 = bstr2str(bstr2)
-		procSysFreeString.Call(bstr2)
-	}
-	return retVal, retVal2, retVal3, nil
-}
-func (v *ITypeInfo) GetDocumentation(in int32) (string, string, uint32, string, error) {
-	var bstr uintptr
-	var bstr2 uintptr
-	var retVal3 uint32
-	var bstr3 uintptr
-	ret, _, _ := syscall.SyscallN(
-		(*ITypeInfoVtbl)(unsafe.Pointer(v.vtbl)).GetDocumentation,
-		uintptr(unsafe.Pointer(v)),
-		uintptr(in),
-		uintptr(unsafe.Pointer(&bstr)),
-		uintptr(unsafe.Pointer(&bstr2)),
-		uintptr(unsafe.Pointer(&retVal3)),
-		uintptr(unsafe.Pointer(&bstr3)),
-	)
-	if ret != 0 {
-		return "", "", 0, "", HResult(ret)
-	}
-	var retVal string
-	var retVal2 string
-	var retVal4 string
-	if bstr != 0 {
-		retVal = bstr2str(bstr)
-		procSysFreeString.Call(bstr)
-	}
-	if bstr2 != 0 {
-		retVal2 = bstr2str(bstr2)
-		procSysFreeString.Call(bstr2)
-	}
-	if bstr3 != 0 {
-		retVal4 = bstr2str(bstr3)
-		procSysFreeString.Call(bstr3)
-	}
-	return retVal, retVal2, retVal3, retVal4, nil
-}
-func (v *ITypeInfo) GetFuncDesc(in uint32) (*TagFuncDesc, error) {
-	var retVal *TagFuncDesc
-	ret, _, _ := syscall.SyscallN(
-		(*ITypeInfoVtbl)(unsafe.Pointer(v.vtbl)).GetFuncDesc,
-		uintptr(unsafe.Pointer(v)),
-		uintptr(in),
-		uintptr(unsafe.Pointer(&retVal)),
-	)
-	if ret != 0 {
-		return nil, HResult(ret)
-	}
-	return retVal, nil
-}
-func (v *ITypeInfo) GetIDsOfNames() error {
-	return nil
-}
-func (v *ITypeInfo) GetImplTypeFlags(in uint32) (int32, error) {
-	var retVal int32
-	ret, _, _ := syscall.SyscallN(
-		(*ITypeInfoVtbl)(unsafe.Pointer(v.vtbl)).GetImplTypeFlags,
-		uintptr(unsafe.Pointer(v)),
-		uintptr(in),
-		uintptr(unsafe.Pointer(&retVal)),
-	)
-	if ret != 0 {
-		return -1, HResult(ret)
-	}
-	return retVal, nil
-}
-func (v *ITypeInfo) GetMops(in int32) (string, error) {
-	var bstr uintptr
-	ret, _, _ := syscall.SyscallN(
-		(*ITypeInfoVtbl)(unsafe.Pointer(v.vtbl)).GetMops,
-		uintptr(unsafe.Pointer(v)),
-		uintptr(in),
-		uintptr(unsafe.Pointer(&bstr)),
-	)
-	if ret != 0 {
-		return "", HResult(ret)
-	}
-	var retVal string
-	if bstr != 0 {
-		retVal = bstr2str(bstr)
-		procSysFreeString.Call(bstr)
-	}
-	return retVal, nil
-}
-func (v *ITypeInfo) GetNames(in int32, in2 uint32) (string, uint32, error) {
-	var bstr uintptr
-	var retVal2 uint32
-	ret, _, _ := syscall.SyscallN(
-		(*ITypeInfoVtbl)(unsafe.Pointer(v.vtbl)).GetNames,
-		uintptr(unsafe.Pointer(v)),
-		uintptr(in),
-		uintptr(unsafe.Pointer(&bstr)),
-		uintptr(in2),
-		uintptr(unsafe.Pointer(&retVal2)),
-	)
-	if ret != 0 {
-		return "", 0, HResult(ret)
-	}
-	var retVal string
-	if bstr != 0 {
-		retVal = bstr2str(bstr)
-		procSysFreeString.Call(bstr)
-	}
-	return retVal, retVal2, nil
-}
-
-func (v *ITypeInfo) GetRefTypeInfo() error {
-	return nil
-}
-func (v *ITypeInfo) GetRefTypeOfImplType() error {
-	return nil
-}
-func (v *ITypeInfo) GetTypeAttr() error {
-	return nil
-}
-func (v *ITypeInfo) GetTypeComp() error {
-	return nil
-}
-func (v *ITypeInfo) GetVarDesc() error {
-	return nil
-}
-func (v *ITypeInfo) Invoke() error {
-	return nil
-}
-func (v *ITypeInfo) ReleaseFuncDesc() error {
-	return nil
-}
-func (v *ITypeInfo) ReleaseTypeAttr() error {
-	return nil
-}
-func (v *ITypeInfo) ReleaseVarDesc() error {
-	return nil
-}
-
-type ITypeLib struct {
-	vtbl *IUnKnown
-}
-
-func (v *ITypeLib) Release() uint32 {
-	return (*IUnKnown)(unsafe.Pointer(v)).Release()
-}
-
-type ITypeLibVtbl struct {
-	IUnKnownVtbl
-}
-
-// TODO:: ITypeLib method
-func newITypeLib(unk *IUnKnown) *ITypeLib {
-	return (*ITypeLib)(unsafe.Pointer(unk))
-}
-func NewITypeLib(unk *IUnKnown) *ITypeLib {
-	return newITypeLib(unk)
-}
-func (v *ITypeLib) FindName() error {
-	return nil
-}
-func (v *ITypeLib) GetDocumentation() error {
-	return nil
-}
-func (v *ITypeLib) GetLibAttr() error {
-	return nil
-}
-func (v *ITypeLib) GetTypeComp() error {
-	return nil
-}
-func (v *ITypeLib) GetTypeInfo() error {
-	return nil
-}
-func (v *ITypeLib) GetTypeInfoCount() error {
-	return nil
-}
-func (v *ITypeLib) GetTypeInfoOfGuid() error {
-	return nil
-}
-func (v *ITypeLib) GetTypeInfoType() error {
-	return nil
-}
-func (v *ITypeLib) IsName() error {
-	return nil
-}
-func (v *ITypeLib) ReleaseTLibAttr() error {
-	return nil
-}
+*/
