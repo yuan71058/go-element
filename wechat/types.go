@@ -113,6 +113,7 @@ const (
 	MsgTypeVoice     = "语音"      // 语音消息
 	MsgTypeVoiceCall = "语音通话" // 语音通话
 	MsgTypeVideo     = "视频"      // 视频消息
+	MsgTypeFile      = "文件"      // 文件消息
 )
 
 // ParseMessageType 根据消息内容判断消息类型
@@ -128,6 +129,8 @@ func ParseMessageType(content string) string {
 		return MsgTypeVoiceCall
 	case hasPrefix(content, "[视频]"):
 		return MsgTypeVideo
+	case hasPrefix(content, "[文件]"):
+		return MsgTypeFile
 	default:
 		return MsgTypeText
 	}
