@@ -19,7 +19,7 @@
 
 ### 安装
 ```shell
-go get -u github.com/auuunya/go-element
+go get -u github.com/yuan71058/go-element
 ```
 
 ### 编译说明
@@ -1160,7 +1160,7 @@ package main
 
 import (
     "fmt"
-    uia "github.com/auuunya/go-element"
+    uia "github.com/yuan71058/go-element"
 )
 
 func main() {
@@ -1217,7 +1217,7 @@ func main() {
 package main
 
 import (
-    uia "github.com/auuunya/go-element"
+    uia "github.com/yuan71058/go-element"
 )
 
 func main() {
@@ -1255,7 +1255,7 @@ package main
 
 import (
     "fmt"
-    uia "github.com/auuunya/go-element"
+    uia "github.com/yuan71058/go-element"
 )
 
 func main() {
@@ -1295,7 +1295,7 @@ package main
 
 import (
     "fmt"
-    uia "github.com/auuunya/go-element"
+    uia "github.com/yuan71058/go-element"
 )
 
 func main() {
@@ -1328,7 +1328,7 @@ package main
 
 import (
     "fmt"
-    uia "github.com/auuunya/go-element"
+    uia "github.com/yuan71058/go-element"
 )
 
 func main() {
@@ -1364,7 +1364,7 @@ import (
     "fmt"
     "log"
     "time"
-    uia "github.com/auuunya/go-element"
+    uia "github.com/yuan71058/go-element"
 )
 
 func main() {

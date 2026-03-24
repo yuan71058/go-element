@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	uia "github.com/auuunya/go-element"
+	uia "github.com/yuan71058/go-element"
 )
 
 var logFile string = "notepad_debug.log"

@@ -1,5 +1,5 @@
 ## 用于 Windows 窗体自动化的 Go 语言 UI Automation 库
-[![Go Reference](https://pkg.go.dev/badge/github.com/auuunya/go-element.svg)](https://pkg.go.dev/github.com/auuunya/go-element)
+[![Go Reference](https://pkg.go.dev/badge/github.com/yuan71058/go-element.svg)](https://pkg.go.dev/github.com/yuan71058/go-element)
 
 ### 概述
 本库为使用 Windows UI Automation 框架进行 UI 自动化提供了一个高性能且易用的 Go 语言接口。它允许开发者通过 Windows COM 接口与应用程序中的 UI 元素进行高效交互和操作。
@@ -13,7 +13,7 @@
 
 ### 安装
 ```shell
-go get -u github.com/auuunya/go-element
+go get -u github.com/yuan71058/go-element
 ```
 
 ### 编译说明
@@ -33,7 +33,7 @@ go get -u github.com/auuunya/go-element
 
 #### 1. 输出 UI 结构树 (以浏览器为例)
 ```go
-import uia "github.com/auuunya/go-element"
+import uia "github.com/yuan71058/go-element"
 
 func main() {
 	uia.CoInitialize()

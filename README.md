@@ -2,8 +2,8 @@
 
 # 🪟 Windows UI Automation Go 语言库
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/auuunya/go-element.svg)](https://pkg.go.dev/github.com/auuunya/go-element)
-[![Go Report Card](https://goreportcard.com/badge/github.com/auuunya/go-element)](https://goreportcard.com/report/github.com/auuunya/go-element)
+[![Go Reference](https://pkg.go.dev/badge/github.com/yuan71058/go-element.svg)](https://pkg.go.dev/github.com/yuan71058/go-element)
+[![Go Report Card](https://goreportcard.com/badge/github.com/yuan71058/go-element)](https://goreportcard.com/report/github.com/yuan71058/go-element)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)](https://golang.org/dl/)
 
@@ -40,7 +40,7 @@
 ## 📦 安装
 
 ```shell
-go get -u github.com/auuunya/go-element
+go get -u github.com/yuan71058/go-element
 ```
 
 ## 🔨 编译说明
@@ -63,7 +63,7 @@ package main
 
 import (
     "fmt"
-    uia "github.com/auuunya/go-element"
+    uia "github.com/yuan71058/go-element"
 )
 
 func main() {
