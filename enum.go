@@ -1,151 +1,183 @@
+// Package uiautomation 提供 Windows UI Automation 的 Go 语言封装
 package uiautomation
 
+// TxtHitResult 文本命中测试结果
 type TxtHitResult int32
 
+// 文本命中测试结果常量
 const (
-	TXTHITRESULT_NOHIT TxtHitResult = iota
-	TXTHITRESULT_TRANSPARENT
-	TXTHITRESULT_CLOSE
-	TXTHITRESULT_HIT
+	TXTHITRESULT_NOHIT        TxtHitResult = iota // 未命中
+	TXTHITRESULT_TRANSPARENT                     // 透明区域
+	TXTHITRESULT_CLOSE                           // 接近
+	TXTHITRESULT_HIT                             // 命中
 )
 
+// StructureChangeType 结构变更类型
 type StructureChangeType int32
 
+// 结构变更类型常量
 const (
-	StructureChangeType_ChildAdded StructureChangeType = iota
-	StructureChangeType_ChildRemoved
-	StructureChangeType_ChildrenInvalidated
-	StructureChangeType_ChildrenBulkAdded
-	StructureChangeType_ChildrenBulkRemoved
-	StructureChangeType_ChildrenReordered
+	StructureChangeType_ChildAdded          StructureChangeType = iota // 子元素已添加
+	StructureChangeType_ChildRemoved                                  // 子元素已移除
+	StructureChangeType_ChildrenInvalidated                           // 子元素已失效
+	StructureChangeType_ChildrenBulkAdded                             // 批量添加子元素
+	StructureChangeType_ChildrenBulkRemoved                           // 批量移除子元素
+	StructureChangeType_ChildrenReordered                             // 子元素已重新排序
 )
 
+// WindowVisualState 窗口可视状态
 type WindowVisualState int32
 
+// 窗口可视状态常量
+// 参考: https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-windowvisualstate
 const (
-	// https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-windowvisualstate
-	WindowVisualState_Normal WindowVisualState = iota
-	WindowVisualState_Maximized
-	WindowVisualState_Minimized
+	WindowVisualState_Normal   WindowVisualState = iota // 正常状态
+	WindowVisualState_Maximized                          // 最大化
+	WindowVisualState_Minimized                          // 最小化
 )
 
+// ToggleState 切换状态
 type ToggleState int32
 
+// 切换状态常量
+// 参考: https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-togglestate
 const (
-	// https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-togglestate
-	ToggleState_Off ToggleState = iota
-	ToggleState_On
-	ToggleState_Indeterminate
+	ToggleState_Off          ToggleState = iota // 关闭
+	ToggleState_On                             // 打开
+	ToggleState_Indeterminate                  // 不确定（三态复选框）
 )
 
+// ZoomUnit 缩放单位
 type ZoomUnit int32
 
+// 缩放单位常量
+// 参考: https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-zoomunit
 const (
-	// https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-zoomunit
-	ZoomUnit_NoAmount ZoomUnit = iota
-	ZoomUnit_LargeDecrement
-	ZoomUnit_SmallDecrement
-	ZoomUnit_LargeIncrement
-	ZoomUnit_SmallIncrement
+	ZoomUnit_NoAmount       ZoomUnit = iota // 无缩放
+	ZoomUnit_LargeDecrement                 // 大幅度缩小
+	ZoomUnit_SmallDecrement                 // 小幅度缩小
+	ZoomUnit_LargeIncrement                 // 大幅度放大
+	ZoomUnit_SmallIncrement                 // 小幅度放大
 )
 
+// WindowInteractionState 窗口交互状态
 type WindowInteractionState int32
 
+// 窗口交互状态常量
+// 参考: https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-windowinteractionstate
 const (
-	// https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-windowinteractionstate
-	WindowInteractionState_Running WindowInteractionState = iota
-	WindowInteractionState_Closing
-	WindowInteractionState_ReadyForUserInteraction
-	WindowInteractionState_BlockedByModalWindow
-	WindowInteractionState_NotResponding
+	WindowInteractionState_Running              WindowInteractionState = iota // 正在运行
+	WindowInteractionState_Closing                                         // 正在关闭
+	WindowInteractionState_ReadyForUserInteraction                         // 准备好用户交互
+	WindowInteractionState_BlockedByModalWindow                            // 被模态窗口阻塞
+	WindowInteractionState_NotResponding                                   // 无响应
 )
 
+// SupportedTextSelection 支持的文本选择类型
 type SupportedTextSelection int32
 
+// 支持的文本选择类型常量
+// 参考: https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-supportedtextselection
 const (
-	// https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-supportedtextselection
-	SupportedTextSelection_None SupportedTextSelection = iota
-	SupportedTextSelection_Single
-	SupportedTextSelection_Multiple
+	SupportedTextSelection_None    SupportedTextSelection = iota // 不支持选择
+	SupportedTextSelection_Single                               // 单选
+	SupportedTextSelection_Multiple                             // 多选
 )
 
+// ScrollAmount 滚动量
 type ScrollAmount int32
 
+// 滚动量常量
+// 参考: https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-scrollamount
 const (
-	// https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-scrollamount
-	ScrollAmount_LargeDecrement ScrollAmount = iota
-	ScrollAmount_SmallDecrement
-	ScrollAmount_NoAmount
-	ScrollAmount_LargeIncrement
-	ScrollAmount_SmallIncrement
+	ScrollAmount_LargeDecrement ScrollAmount = iota // 大幅度后退
+	ScrollAmount_SmallDecrement                     // 小幅度后退
+	ScrollAmount_NoAmount                           // 无滚动
+	ScrollAmount_LargeIncrement                     // 大幅度前进
+	ScrollAmount_SmallIncrement                     // 小幅度前进
 )
 
+// RowOrColumnMajor 行或列主导
 type RowOrColumnMajor int32
 
+// 行或列主导常量
+// 参考: https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-roworcolumnmajor
 const (
-	// https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-roworcolumnmajor
-	RowOrColumnMajor_RowMajor RowOrColumnMajor = iota
-	RowOrColumnMajor_ColumnMajor
-	RowOrColumnMajor_Indeterminate
+	RowOrColumnMajor_RowMajor     RowOrColumnMajor = iota // 行主导
+	RowOrColumnMajor_ColumnMajor                          // 列主导
+	RowOrColumnMajor_Indeterminate                        // 不确定
 )
 
+// TextPatternRangeEndpoint 文本范围端点
 type TextPatternRangeEndpoint int32
 
+// 文本范围端点常量
+// 参考: https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-textpatternrangeendpoint
 const (
-	// https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-textpatternrangeendpoint
-	TextPatternRangeEndpoint_Start TextPatternRangeEndpoint = iota
-	TextPatternRangeEndpoint_End
+	TextPatternRangeEndpoint_Start TextPatternRangeEndpoint = iota // 起点
+	TextPatternRangeEndpoint_End                                   // 终点
 )
 
+// TextUnit 文本单位
 type TextUnit int32
 
+// 文本单位常量
+// 参考: https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-textunit
 const (
-	// https://learn.microsoft.com/zh-cn/windows/win32/api/uiautomationcore/ne-uiautomationcore-textunit
-	TextUnit_Character TextUnit = iota
-	TextUnit_Format
-	TextUnit_Word
-	TextUnit_Line
-	TextUnit_Paragraph
-	TextUnit_Page
-	TextUnit_Document
+	TextUnit_Character TextUnit = iota // 字符
+	TextUnit_Format                    // 格式
+	TextUnit_Word                      // 单词
+	TextUnit_Line                      // 行
+	TextUnit_Paragraph                 // 段落
+	TextUnit_Page                      // 页
+	TextUnit_Document                  // 文档
 )
 
+// TextArrtibuteId 文本属性ID
 type TextArrtibuteId int32
 
+// 文本属性ID常量
+// 参考: https://learn.microsoft.com/zh-cn/windows/win32/winauto/uiauto-textattribute-ids
 const (
-// https://learn.microsoft.com/zh-cn/windows/win32/winauto/uiauto-textattribute-ids
+	// 文本属性ID定义
 )
 
+// OrientationType 方向类型
 type OrientationType int32
 
+// 方向类型常量
 const (
-	OrientationType_None OrientationType = iota
-	OrientationType_Horizontal
-	OrientationType_Vertical
+	OrientationType_None       OrientationType = iota // 无方向
+	OrientationType_Horizontal                        // 水平
+	OrientationType_Vertical                          // 垂直
 )
 
+// TagFuncKind 函数类型
 type TagFuncKind int32
 
+// 函数类型常量
 const (
-	FUNC_VIRTUAL TagFuncKind = iota
-	FUNC_PUREVIRTUAL
-	FUNC_NONVIRTUAL
-	FUNC_STATIC
-	FUNC_DISPATCH
+	FUNC_VIRTUAL    TagFuncKind = iota // 虚函数
+	FUNC_PUREVIRTUAL                   // 纯虚函数
+	FUNC_NONVIRTUAL                    // 非虚函数
+	FUNC_STATIC                        // 静态函数
+	FUNC_DISPATCH                      // 分发函数
 )
 
+// TagCallConv 调用约定
 type TagCallConv int32
 
+// 调用约定常量
 const (
-	CC_FASTCALL TagCallConv = iota
-	CC_CDECL
-	CC_MSCPASCAL
-	CC_PASCAL
-	CC_MACPASCAL
-	CC_STDCALL
-	CC_FPFASTCALL
-	CC_SYSCALL
-	CC_MPWCDECL
-	CC_MPWPASCAL
-	CC_MAX
+	CC_FASTCALL   TagCallConv = iota // 快速调用
+	CC_CDECL                         // C 声明
+	CC_MSCPASCAL                     // MSC Pascal
+	CC_PASCAL                        // Pascal
+	CC_MACPASCAL                     // Mac Pascal
+	CC_STDCALL                       // 标准调用
+	CC_FPFASTCALL                    // FP 快速调用
+	CC_SYSCALL                       // 系统调用
+	CC_MPWCDECL                      // MPW C 声明
+	CC_MPWPASCAL                     // MPW Pascal
+	CC_MAX                           // 最大值
 )

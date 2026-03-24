@@ -1,3 +1,4 @@
+// Package uiautomation 提供 Windows UI Automation 的 Go 语言封装
 package uiautomation
 
 import (
@@ -5,89 +6,103 @@ import (
 	"unsafe"
 )
 
+// IUIAutomation UI Automation 核心接口
+// 提供创建 UI Automation 对象和访问 UI 元素的方法
 type IUIAutomation struct {
 	vtbl *IUnKnown
 }
 
+// Release 释放 UI Automation 对象
+// 返回: 引用计数
 func (v *IUIAutomation) Release() uint32 {
 	return (*IUnKnown)(unsafe.Pointer(v)).Release()
 }
 
+// IUIAutomationVtbl UI Automation 接口虚函数表
 type IUIAutomationVtbl struct {
 	IUnKnownVtbl
 
-	CompareElements                           uintptr
-	CompareRuntimeIds                         uintptr
-	GetRootElement                            uintptr
-	ElementFromHandle                         uintptr
-	ElementFromPoint                          uintptr
-	GetFocusedElement                         uintptr
-	GetRootElementBuildCache                  uintptr
-	ElementFromHandleBuildCache               uintptr
-	ElementFromPointBuildCache                uintptr
-	GetFocusedElementBuildCache               uintptr
-	CreateTreeWalker                          uintptr
-	Get_ControlViewWalker                     uintptr
-	Get_ContentViewWalker                     uintptr
-	Get_RawViewWalker                         uintptr
-	Get_RawViewCondition                      uintptr
-	Get_ControlViewCondition                  uintptr
-	Get_ContentViewCondition                  uintptr
-	CreateCacheRequest                        uintptr
-	CreateTrueCondition                       uintptr
-	CreateFalseCondition                      uintptr
-	CreatePropertyCondition                   uintptr
-	CreatePropertyConditionEx                 uintptr
-	CreateAndCondition                        uintptr
-	CreateAndConditionFromArray               uintptr
-	CreateAndConditionFromNativeArray         uintptr
-	CreateOrCondition                         uintptr
-	CreateOrConditionFromArray                uintptr
-	CreateOrConditionFromNativeArray          uintptr
-	CreateNotCondition                        uintptr
-	AddAutomationEventHandler                 uintptr
-	RemoveAutomationEventHandler              uintptr
-	AddPropertyChangedEventHandlerNativeArray uintptr
-	AddPropertyChangedEventHandler            uintptr
-	RemovePropertyChangedEventHandler         uintptr
-	AddStructureChangedEventHandler           uintptr
-	RemoveStructureChangedEventHandler        uintptr
-	AddFocusChangedEventHandler               uintptr
-	RemoveFocusChangedEventHandler            uintptr
-	RemoveAllEventHandlers                    uintptr
-	IntNativeArrayToSafeArray                 uintptr
-	IntSafeArrayToNativeArray                 uintptr
-	RectToVariant                             uintptr
-	VariantToRect                             uintptr
-	SafeArrayToRectNativeArray                uintptr
-	CreateProxyFactoryEntry                   uintptr
-	Get_ProxyFactoryMapping                   uintptr
-	GetPropertyProgrammaticName               uintptr
-	GetPatternProgrammaticName                uintptr
-	PollForPotentialSupportedPatterns         uintptr
-	PollForPotentialSupportedProperties       uintptr
-	CheckNotSupported                         uintptr
-	Get_ReservedNotSupportedValue             uintptr
-	Get_ReservedMixedAttributeValue           uintptr
-	ElementFromIAccessible                    uintptr
-	ElementFromIAccessibleBuildCache          uintptr
+	CompareElements                           uintptr // 比较两个元素是否相同
+	CompareRuntimeIds                         uintptr // 比较两个运行时ID
+	GetRootElement                            uintptr // 获取桌面根元素
+	ElementFromHandle                         uintptr // 从窗口句柄获取元素
+	ElementFromPoint                          uintptr // 从屏幕坐标获取元素
+	GetFocusedElement                         uintptr // 获取当前焦点元素
+	GetRootElementBuildCache                  uintptr // 获取根元素（带缓存）
+	ElementFromHandleBuildCache               uintptr // 从句柄获取元素（带缓存）
+	ElementFromPointBuildCache                uintptr // 从坐标获取元素（带缓存）
+	GetFocusedElementBuildCache               uintptr // 获取焦点元素（带缓存）
+	CreateTreeWalker                          uintptr // 创建树遍历器
+	Get_ControlViewWalker                     uintptr // 获取控件视图遍历器
+	Get_ContentViewWalker                     uintptr // 获取内容视图遍历器
+	Get_RawViewWalker                         uintptr // 获取原始视图遍历器
+	Get_RawViewCondition                      uintptr // 获取原始视图条件
+	Get_ControlViewCondition                  uintptr // 获取控件视图条件
+	Get_ContentViewCondition                  uintptr // 获取内容视图条件
+	CreateCacheRequest                        uintptr // 创建缓存请求
+	CreateTrueCondition                       uintptr // 创建 True 条件
+	CreateFalseCondition                      uintptr // 创建 False 条件
+	CreatePropertyCondition                   uintptr // 创建属性条件
+	CreatePropertyConditionEx                 uintptr // 创建扩展属性条件
+	CreateAndCondition                        uintptr // 创建 AND 条件
+	CreateAndConditionFromArray               uintptr // 从数组创建 AND 条件
+	CreateAndConditionFromNativeArray         uintptr // 从原生数组创建 AND 条件
+	CreateOrCondition                         uintptr // 创建 OR 条件
+	CreateOrConditionFromArray                uintptr // 从数组创建 OR 条件
+	CreateOrConditionFromNativeArray          uintptr // 从原生数组创建 OR 条件
+	CreateNotCondition                        uintptr // 创建 NOT 条件
+	AddAutomationEventHandler                 uintptr // 添加自动化事件处理器
+	RemoveAutomationEventHandler              uintptr // 移除自动化事件处理器
+	AddPropertyChangedEventHandlerNativeArray uintptr // 添加属性变更事件处理器（原生数组）
+	AddPropertyChangedEventHandler            uintptr // 添加属性变更事件处理器
+	RemovePropertyChangedEventHandler         uintptr // 移除属性变更事件处理器
+	AddStructureChangedEventHandler           uintptr // 添加结构变更事件处理器
+	RemoveStructureChangedEventHandler        uintptr // 移除结构变更事件处理器
+	AddFocusChangedEventHandler               uintptr // 添加焦点变更事件处理器
+	RemoveFocusChangedEventHandler            uintptr // 移除焦点变更事件处理器
+	RemoveAllEventHandlers                    uintptr // 移除所有事件处理器
+	IntNativeArrayToSafeArray                 uintptr // 整数原生数组转 SAFEARRAY
+	IntSafeArrayToNativeArray                 uintptr // SAFEARRAY 转整数原生数组
+	RectToVariant                             uintptr // 矩形转 VARIANT
+	VariantToRect                             uintptr // VARIANT 转矩形
+	SafeArrayToRectNativeArray                uintptr // SAFEARRAY 转矩形数组
+	CreateProxyFactoryEntry                   uintptr // 创建代理工厂条目
+	Get_ProxyFactoryMapping                   uintptr // 获取代理工厂映射
+	GetPropertyProgrammaticName               uintptr // 获取属性程序名称
+	GetPatternProgrammaticName                uintptr // 获取模式程序名称
+	PollForPotentialSupportedPatterns         uintptr // 轮询潜在支持的模式
+	PollForPotentialSupportedProperties       uintptr // 轮询潜在支持的属性
+	CheckNotSupported                         uintptr // 检查是否不支持
+	Get_ReservedNotSupportedValue             uintptr // 获取保留的不支持值
+	Get_ReservedMixedAttributeValue           uintptr // 获取保留的混合属性值
+	ElementFromIAccessible                    uintptr // 从 IAccessible 获取元素
+	ElementFromIAccessibleBuildCache          uintptr // 从 IAccessible 获取元素（带缓存）
 }
 
+// newIUIAutomation 内部函数：从 IUnKnown 创建 IUIAutomation
 func newIUIAutomation(unk *IUnKnown) *IUIAutomation {
 	return (*IUIAutomation)(unsafe.Pointer(unk))
 }
+
+// NewIUIAutomation 创建 IUIAutomation 实例
+// 参数: unk - IUnKnown 接口
+// 返回: IUIAutomation 实例
 func NewIUIAutomation(unk *IUnKnown) *IUIAutomation {
 	return newIUIAutomation(unk)
 }
 
+// EventHandler 自动化事件处理器配置
 type EventHandler struct {
-	EventId      UIA_EventId
-	Element      *IUIAutomationElement
-	Scope        TreeScope
-	CacheRequest *IUIAutomationCacheRequest
-	Handler      *IUIAutomationEventHandler
+	EventId      UIA_EventId                // 事件ID
+	Element      *IUIAutomationElement      // 目标元素
+	Scope        TreeScope                  // 搜索范围
+	CacheRequest *IUIAutomationCacheRequest // 缓存请求
+	Handler      *IUIAutomationEventHandler // 事件处理器
 }
 
+// AddAutomationEventHandler 添加自动化事件处理器
+// 参数: opt - 事件处理器配置
+// 返回: 错误信息
 func (v *IUIAutomation) AddAutomationEventHandler(opt *EventHandler) error {
 	ret, _, _ := syscall.SyscallN(
 		(*IUIAutomationVtbl)(unsafe.Pointer(v.vtbl)).AddAutomationEventHandler,
@@ -104,6 +119,12 @@ func (v *IUIAutomation) AddAutomationEventHandler(opt *EventHandler) error {
 	return nil
 }
 
+// AddFocusChangedEventHandler 添加焦点变更事件处理器
+// 参数:
+//   - in: 缓存请求
+//   - in2: 焦点变更事件处理器
+//
+// 返回: 错误信息
 func (v *IUIAutomation) AddFocusChangedEventHandler(in *IUIAutomationCacheRequest, in2 *IUIAutomationFocusChangedEventHandler) error {
 	ret, _, _ := syscall.SyscallN(
 		(*IUIAutomationVtbl)(unsafe.Pointer(v.vtbl)).AddFocusChangedEventHandler,
@@ -117,14 +138,18 @@ func (v *IUIAutomation) AddFocusChangedEventHandler(in *IUIAutomationCacheReques
 	return nil
 }
 
+// ChangeEventHandler 属性变更事件处理器配置
 type ChangeEventHandler struct {
-	Element       *IUIAutomationElement
-	Scope         TreeScope
-	CacheRequest  *IUIAutomationCacheRequest
-	Handler       *IUIAutomationPropertyChangedEventHandler
-	PropertyArray *TagSafeArray
+	Element       *IUIAutomationElement                     // 目标元素
+	Scope         TreeScope                                 // 搜索范围
+	CacheRequest  *IUIAutomationCacheRequest                // 缓存请求
+	Handler       *IUIAutomationPropertyChangedEventHandler // 事件处理器
+	PropertyArray *TagSafeArray                             // 属性数组
 }
 
+// AddPropertyChangedEventHandler 添加属性变更事件处理器
+// 参数: opt - 属性变更事件处理器配置
+// 返回: 错误信息
 func (v *IUIAutomation) AddPropertyChangedEventHandler(opt *ChangeEventHandler) error {
 	ret, _, _ := syscall.SyscallN(
 		(*IUIAutomationVtbl)(unsafe.Pointer(v.vtbl)).AddPropertyChangedEventHandler,
@@ -141,15 +166,19 @@ func (v *IUIAutomation) AddPropertyChangedEventHandler(opt *ChangeEventHandler) 
 	return nil
 }
 
+// ChangeEventHandlerNativeArray 属性变更事件处理器配置（原生数组版本）
 type ChangeEventHandlerNativeArray struct {
-	Element       *IUIAutomationElement
-	Scope         TreeScope
-	CacheRequest  *IUIAutomationCacheRequest
-	Handler       *IUIAutomationPropertyChangedEventHandler
-	PropertyArray *TagSafeArray
-	PropertyCount int32
+	Element       *IUIAutomationElement                     // 目标元素
+	Scope         TreeScope                                 // 搜索范围
+	CacheRequest  *IUIAutomationCacheRequest                // 缓存请求
+	Handler       *IUIAutomationPropertyChangedEventHandler // 事件处理器
+	PropertyArray *TagSafeArray                             // 属性数组
+	PropertyCount int32                                     // 属性数量
 }
 
+// AddPropertyChangedEventHandlerNativeArray 添加属性变更事件处理器（原生数组版本）
+// 参数: opt - 属性变更事件处理器配置
+// 返回: 错误信息
 func (v *IUIAutomation) AddPropertyChangedEventHandlerNativeArray(opt *ChangeEventHandlerNativeArray) error {
 	ret, _, _ := syscall.SyscallN(
 		(*IUIAutomationVtbl)(unsafe.Pointer(v.vtbl)).AddPropertyChangedEventHandlerNativeArray,
@@ -167,13 +196,17 @@ func (v *IUIAutomation) AddPropertyChangedEventHandlerNativeArray(opt *ChangeEve
 	return nil
 }
 
+// StructureChangedEventHandler 结构变更事件处理器配置
 type StructureChangedEventHandler struct {
-	Element      *IUIAutomationElement
-	Scope        TreeScope
-	CacheRequest *IUIAutomationCacheRequest
-	Handler      *IUIAutomationPropertyChangedEventHandler
+	Element      *IUIAutomationElement                     // 目标元素
+	Scope        TreeScope                                 // 搜索范围
+	CacheRequest *IUIAutomationCacheRequest                // 缓存请求
+	Handler      *IUIAutomationPropertyChangedEventHandler // 事件处理器
 }
 
+// AddStructureChangedEventHandler 添加结构变更事件处理器
+// 参数: opt - 结构变更事件处理器配置
+// 返回: 错误信息
 func (v *IUIAutomation) AddStructureChangedEventHandler(opt *StructureChangedEventHandler) error {
 	ret, _, _ := syscall.SyscallN(
 		(*IUIAutomationVtbl)(unsafe.Pointer(v.vtbl)).AddStructureChangedEventHandler,
@@ -188,6 +221,10 @@ func (v *IUIAutomation) AddStructureChangedEventHandler(opt *StructureChangedEve
 	}
 	return nil
 }
+
+// CheckNotSupported 检查 VARIANT 值是否为"不支持"
+// 参数: in - VARIANT 值
+// 返回: 是否不支持，以及可能的错误
 func (v *IUIAutomation) CheckNotSupported(in *VARIANT) (int32, error) {
 	var retVal int32
 	ret, _, _ := syscall.SyscallN(
@@ -201,6 +238,13 @@ func (v *IUIAutomation) CheckNotSupported(in *VARIANT) (int32, error) {
 	}
 	return retVal, nil
 }
+
+// CompareElements 比较两个 UI 元素是否相同
+// 参数:
+//   - in: 第一个元素
+//   - in2: 第二个元素
+//
+// 返回: 是否相同（非0表示相同），以及可能的错误
 func (v *IUIAutomation) CompareElements(in, in2 *IUIAutomationElement) (int32, error) {
 	var retVal int32
 	ret, _, _ := syscall.SyscallN(
@@ -215,6 +259,13 @@ func (v *IUIAutomation) CompareElements(in, in2 *IUIAutomationElement) (int32, e
 	}
 	return retVal, nil
 }
+
+// CompareRuntimeIds 比较两个运行时ID是否相同
+// 参数:
+//   - in: 第一个运行时ID数组
+//   - in2: 第二个运行时ID数组
+//
+// 返回: 是否相同（非0表示相同），以及可能的错误
 func (v *IUIAutomation) CompareRuntimeIds(in, in2 *TagSafeArray) (int32, error) {
 	var retVal int32
 	ret, _, _ := syscall.SyscallN(
@@ -229,6 +280,13 @@ func (v *IUIAutomation) CompareRuntimeIds(in, in2 *TagSafeArray) (int32, error) 
 	}
 	return retVal, nil
 }
+
+// CreateAndCondition 创建 AND 条件（两个条件都必须满足）
+// 参数:
+//   - in: 第一个条件
+//   - in2: 第二个条件
+//
+// 返回: 组合后的条件，以及可能的错误
 func (v *IUIAutomation) CreateAndCondition(in, in2 *IUIAutomationCondition) (*IUIAutomationCondition, error) {
 	var retVal *IUIAutomationCondition
 	ret, _, _ := syscall.SyscallN(
@@ -270,6 +328,10 @@ func (v *IUIAutomation) CreateAndConditionFromNativeArray(in *IUIAutomationCondi
 	}
 	return retVal, nil
 }
+
+// CreateCacheRequest 创建缓存请求对象
+// 用于批量获取元素属性，减少跨进程通信开销
+// 返回: 缓存请求对象，以及可能的错误
 func (v *IUIAutomation) CreateCacheRequest() (*IUIAutomationCacheRequest, error) {
 	var retVal *IUIAutomationCacheRequest
 	ret, _, _ := syscall.SyscallN(
@@ -282,6 +344,9 @@ func (v *IUIAutomation) CreateCacheRequest() (*IUIAutomationCacheRequest, error)
 	}
 	return retVal, nil
 }
+
+// CreateFalseCondition 创建始终为 False 的条件
+// 返回: False 条件，以及可能的错误
 func (v *IUIAutomation) CreateFalseCondition() (*IUIAutomationCondition, error) {
 	var retVal *IUIAutomationCondition
 	ret, _, _ := syscall.SyscallN(
@@ -294,6 +359,10 @@ func (v *IUIAutomation) CreateFalseCondition() (*IUIAutomationCondition, error) 
 	}
 	return retVal, nil
 }
+
+// CreateNotCondition 创建 NOT 条件（对条件取反）
+// 参数: in - 要取反的条件
+// 返回: 取反后的条件，以及可能的错误
 func (v *IUIAutomation) CreateNotCondition(in *IUIAutomationCondition) (*IUIAutomationCondition, error) {
 	var retVal *IUIAutomationCondition
 	ret, _, _ := syscall.SyscallN(
@@ -307,6 +376,13 @@ func (v *IUIAutomation) CreateNotCondition(in *IUIAutomationCondition) (*IUIAuto
 	}
 	return retVal, nil
 }
+
+// CreateOrCondition 创建 OR 条件（任一条件满足即可）
+// 参数:
+//   - in: 第一个条件
+//   - in2: 第二个条件
+//
+// 返回: 组合后的条件，以及可能的错误
 func (v *IUIAutomation) CreateOrCondition(in, in2 *IUIAutomationCondition) (*IUIAutomationCondition, error) {
 	var retVal *IUIAutomationCondition
 	ret, _, _ := syscall.SyscallN(
@@ -376,6 +452,11 @@ func (v *IUIAutomation) CreateProxyFactoryEntry(in *IUIAutomationProxyFactory) (
 	}
 	return retVal, nil
 }
+
+// CreateTreeWalker 创建树遍历器
+// 用于遍历 UI 元素树
+// 参数: in - 遍历条件
+// 返回: 树遍历器，以及可能的错误
 func (v *IUIAutomation) CreateTreeWalker(in *IUIAutomationCondition) (*IUIAutomationTreeWalker, error) {
 	var retVal *IUIAutomationTreeWalker
 	ret, _, _ := syscall.SyscallN(
@@ -389,6 +470,10 @@ func (v *IUIAutomation) CreateTreeWalker(in *IUIAutomationCondition) (*IUIAutoma
 	}
 	return retVal, nil
 }
+
+// CreateTrueCondition 创建始终为 True 的条件
+// 用于匹配所有元素
+// 返回: True 条件
 func (v *IUIAutomation) CreateTrueCondition() *IUIAutomationCondition {
 	var retVal *IUIAutomationCondition
 	syscall.SyscallN(
@@ -398,6 +483,10 @@ func (v *IUIAutomation) CreateTrueCondition() *IUIAutomationCondition {
 	)
 	return retVal
 }
+
+// ElementFromHandle 从窗口句柄获取 UI 元素
+// 参数: in - 窗口句柄
+// 返回: UI 元素，以及可能的错误
 func (v *IUIAutomation) ElementFromHandle(in uintptr) (*IUIAutomationElement, error) {
 	var retVal *IUIAutomationElement
 	ret, _, _ := syscall.SyscallN(
@@ -625,6 +714,10 @@ func (v *IUIAutomation) GetPropertyProgrammaticName(in PropertyId) (string, erro
 	}
 	return retVal, nil
 }
+
+// GetRootElement 获取桌面根元素
+// 桌面是所有 UI 元素的根节点
+// 返回: 根元素，以及可能的错误
 func (v *IUIAutomation) GetRootElement() (*IUIAutomationElement, error) {
 	var retVal *IUIAutomationElement
 	ret, _, _ := syscall.SyscallN(
