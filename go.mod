@@ -1,7 +1,7 @@
-module github.com/auuunya/go-element
+module github.com/yuan71058/go-element
 
 go 1.19
 
-replace github.com/auuunya/go-element => ./
+replace github.com/yuan71058/go-element => ./
 
 require golang.org/x/sys v0.20.0 // indirect

@@ -10,7 +10,7 @@ import (
 	"time"
 	"unsafe"
 
-	uia "github.com/auuunya/go-element"
+	uia "github.com/yuan71058/go-element"
 )
 
 // 微信窗口相关常量

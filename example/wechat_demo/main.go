@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/auuunya/go-element/wechat"
+	"github.com/yuan71058/go-element/wechat"
 )
 
 func main() {

@@ -19,7 +19,7 @@
 ## 安装
 
 ```bash
-go get github.com/auuunya/go-element/wechat
+go get github.com/yuan71058/go-element/wechat
 ```
 
 ## 快速开始
@@ -33,7 +33,7 @@ import (
     "log"
     "time"
 
-    "github.com/auuunya/go-element/wechat"
+    "github.com/yuan71058/go-element/wechat"
 )
 
 func main() {
@@ -183,7 +183,7 @@ import (
     "log"
     "time"
 
-    "github.com/auuunya/go-element/wechat"
+    "github.com/yuan71058/go-element/wechat"
 )
 
 func main() {
@@ -255,7 +255,7 @@ if err != nil {
 
 ## 依赖
 
-- [github.com/auuunya/go-element](https://github.com/auuunya/go-element) - Windows UI Automation 库
+- [github.com/yuan71058/go-element](https://github.com/yuan71058/go-element) - Windows UI Automation 库
 
 ## 许可证
 
