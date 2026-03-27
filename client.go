@@ -3,6 +3,7 @@ package uiautomation
 
 import (
 	"syscall"
+	"time"
 	"unsafe"
 )
 
@@ -27,6 +28,24 @@ func (v *IUIAutomationInvokePattern) Invoke() error {
 	)
 	if ret != 0 {
 		return HResult(ret)
+	}
+	return nil
+}
+
+// DoubleClick 双击控件（调用两次 Invoke）
+// 参数:
+//   - interval: 两次点击之间的间隔时间（毫秒）
+//
+// 返回: 错误信息
+func (v *IUIAutomationInvokePattern) DoubleClick(interval int) error {
+	err := v.Invoke()
+	if err != nil {
+		return err
+	}
+	time.Sleep(time.Duration(interval) * time.Millisecond)
+	err = v.Invoke()
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -156,6 +175,18 @@ func (v *IUIAutomationSelectionItemPattern) Release() uint32 {
 	return (*IUnKnown)(unsafe.Pointer(v)).Release()
 }
 
+// newIUIAutomationSelectionItemPattern 内部函数：从 IUnKnown 创建选择项模式
+func newIUIAutomationSelectionItemPattern(unk *IUnKnown) *IUIAutomationSelectionItemPattern {
+	return (*IUIAutomationSelectionItemPattern)(unsafe.Pointer(unk))
+}
+
+// NewIUIAutomationSelectionItemPattern 创建选择项模式实例
+// 参数: unk - IUnKnown 接口
+// 返回: 选择项模式实例
+func NewIUIAutomationSelectionItemPattern(unk *IUnKnown) *IUIAutomationSelectionItemPattern {
+	return newIUIAutomationSelectionItemPattern(unk)
+}
+
 // IUIAutomationTogglePattern 切换模式接口
 // 用于切换复选框等控件的状态
 type IUIAutomationTogglePattern struct {
@@ -261,4 +292,78 @@ func (v *IUIAutomationExpandCollapsePattern) Collapse() error {
 // 返回: 引用计数
 func (v *IUIAutomationExpandCollapsePattern) Release() uint32 {
 	return (*IUnKnown)(unsafe.Pointer(v)).Release()
+}
+
+// IUIAutomationLegacyIAccessiblePattern 旧版 IAccessible 模式接口
+// 用于执行默认操作（如双击）
+type IUIAutomationLegacyIAccessiblePattern struct {
+	vtbl *IUIAutomationLegacyIAccessiblePatternVtbl
+}
+
+// IUIAutomationLegacyIAccessiblePatternVtbl 旧版 IAccessible 模式虚函数表
+type IUIAutomationLegacyIAccessiblePatternVtbl struct {
+	IUnKnownVtbl
+	Get_CurrentChildId          uintptr // 获取子 ID
+	Get_CurrentDefaultAction    uintptr // 获取默认操作
+	Get_CurrentDescription      uintptr // 获取描述
+	Get_CurrentHelp             uintptr // 获取帮助
+	Get_CurrentKeyboardShortcut uintptr // 获取键盘快捷键
+	Get_CurrentName             uintptr // 获取名称
+	Get_CurrentRole             uintptr // 获取角色
+	Get_CurrentState            uintptr // 获取状态
+	Get_CurrentValue            uintptr // 获取值
+	DoDefaultAction             uintptr // 执行默认操作
+	SetCurrentValue             uintptr // 设置当前值
+	Get_CurrentParent           uintptr // 获取父元素
+	Get_Selection               uintptr // 获取选择
+	Get_FocusedElement          uintptr // 获取焦点元素
+}
+
+// DoDefaultAction 执行默认操作（如双击）
+// 返回: 错误信息
+func (v *IUIAutomationLegacyIAccessiblePattern) DoDefaultAction() error {
+	variant := NewVariant(VT_EMPTY, 0)
+	ret, _, _ := syscall.SyscallN(
+		v.vtbl.DoDefaultAction,
+		uintptr(unsafe.Pointer(v)),
+		uintptr(unsafe.Pointer(&variant)),
+	)
+	if ret != 0 {
+		return HResult(ret)
+	}
+	return nil
+}
+
+// Get_CurrentDefaultAction 获取默认操作
+// 返回: 默认操作和可能的错误
+func (v *IUIAutomationLegacyIAccessiblePattern) Get_CurrentDefaultAction() (string, error) {
+	var bstr uintptr
+	ret, _, _ := syscall.SyscallN(
+		v.vtbl.Get_CurrentDefaultAction,
+		uintptr(unsafe.Pointer(v)),
+		uintptr(unsafe.Pointer(&bstr)),
+	)
+	if ret != 0 {
+		return "", HResult(ret)
+	}
+	defer procSysFreeString.Call(bstr)
+	return bstr2str(bstr), nil
+}
+
+// Release 释放旧版 IAccessible 模式对象
+// 返回: 引用计数
+func (v *IUIAutomationLegacyIAccessiblePattern) Release() uint32 {
+	return (*IUnKnown)(unsafe.Pointer(v)).Release()
+}
+
+// newIUIAutomationLegacyIAccessiblePattern 内部函数：从 IUnKnown 创建旧版 IAccessible 模式
+func newIUIAutomationLegacyIAccessiblePattern(unk *IUnKnown) *IUIAutomationLegacyIAccessiblePattern {
+	return (*IUIAutomationLegacyIAccessiblePattern)(unsafe.Pointer(unk))
+}
+
+// NewIUIAutomationLegacyIAccessiblePattern 创建旧版 IAccessible 模式实例
+// 参数: unk - IUnKnown 接口
+// 返回: 旧版 IAccessible 模式实例
+func NewIUIAutomationLegacyIAccessiblePattern(unk *IUnKnown) *IUIAutomationLegacyIAccessiblePattern {
+	return newIUIAutomationLegacyIAccessiblePattern(unk)
 }

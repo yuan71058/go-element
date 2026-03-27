@@ -3,6 +3,10 @@
 // 支持功能：搜索联系人、发送消息、读取会话列表、新消息监控等
 package wechat
 
+import (
+	"sync"
+)
+
 // Session 会话信息结构体
 // 用于表示微信左侧会话列表中的单个会话项
 type Session struct {
@@ -33,6 +37,19 @@ type NewMessage struct {
 	IsSelf bool
 	// MsgType 消息类型
 	MsgType string
+}
+
+// ChatMessage 聊天消息结构体
+// 用于表示聊天窗口中的单条消息
+type ChatMessage struct {
+	// Content 消息内容
+	Content string `json:"content"`
+	// IsSelf 是否为自己发送的消息
+	IsSelf bool `json:"is_self"`
+	// Time 消息时间
+	Time string `json:"time"`
+	// MsgType 消息类型
+	MsgType string `json:"msg_type"`
 }
 
 // SessionManager 会话管理器
@@ -100,6 +117,127 @@ func (sm *SessionManager) HasSender(sender string) bool {
 	return exists
 }
 
+// FilterConfig 消息过滤配置
+// 用于配置自动回复时的消息过滤规则
+type FilterConfig struct {
+	// PublicAccountKeywords 公众号关键词列表
+	// 包含这些关键词的发送者将被过滤（不回复）
+	PublicAccountKeywords []string
+	// PublicAccountPrefixes 公众号前缀列表
+	// 以这些前缀开头的发送者将被过滤（不回复）
+	PublicAccountPrefixes []string
+	// FilterCollapsedChats 是否过滤折叠的聊天
+	// 折叠的聊天通常包含多个子会话，Name 格式如 "群聊 (3)"
+	FilterCollapsedChats bool
+	// CustomFilters 自定义过滤函数
+	// 返回 true 表示过滤该消息（不回复）
+	CustomFilters []func(sender, content string) bool
+}
+
+// DefaultFilterConfig 默认过滤配置
+// 包含常见的公众号和系统消息过滤规则
+var DefaultFilterConfig = &FilterConfig{
+	PublicAccountKeywords: []string{
+		"公众号", "订阅号", "服务号", "企业号",
+		"gh_", "【", "】",
+	},
+	PublicAccountPrefixes: []string{
+		"服务通知",
+	},
+	FilterCollapsedChats: false,
+	CustomFilters:        nil,
+}
+
+// ReplyRecord 记录已发送的回复
+type ReplyRecord struct {
+	mu      sync.RWMutex
+	records map[string]*ReplyInfo // key: sender, value: reply info
+}
+
+// ReplyInfo 回复信息
+type ReplyInfo struct {
+	Content string
+	Time    string
+	MsgType string
+}
+
+// NewReplyRecord 创建回复记录器
+func NewReplyRecord() *ReplyRecord {
+	return &ReplyRecord{
+		records: make(map[string]*ReplyInfo),
+	}
+}
+
+// IsSelfReply 检查是否是自己发送的回复
+// 参数:
+//   - sender: 发送者名称
+//   - content: 消息内容
+//
+// 返回: true 表示是自己发送的回复
+func (r *ReplyRecord) IsSelfReply(sender, content string) bool {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	lastReply, exists := r.records[sender]
+	if !exists {
+		return false
+	}
+
+	// 只完全匹配，避免误判
+	return content == lastReply.Content
+}
+
+// RecordReply 记录发送的回复
+// 参数:
+//   - sender: 发送者名称
+//   - reply: 回复内容
+func (r *ReplyRecord) RecordReply(sender, reply string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.records[sender] = &ReplyInfo{
+		Content: reply,
+	}
+}
+
+// RecordReplyWithInfo 记录发送的回复（带完整信息）
+// 参数:
+//   - sender: 发送者名称
+//   - content: 回复内容
+//   - time: 回复时间
+//   - msgType: 消息类型
+func (r *ReplyRecord) RecordReplyWithInfo(sender, content, time, msgType string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.records[sender] = &ReplyInfo{
+		Content: content,
+		Time:    time,
+		MsgType: msgType,
+	}
+}
+
+// AutoReplyConfig 自动回复配置
+type AutoReplyConfig struct {
+	// WechatId 当前登录的微信号
+	WechatId string
+	// Contacts 要监控的联系人列表
+	Contacts []string
+	// FilterConfig 消息过滤配置
+	FilterConfig *FilterConfig
+	// ReplyGenerator 回复生成函数
+	// 参数: content - 收到的消息内容
+	// 返回: 回复内容，空字符串表示不回复
+	ReplyGenerator func(content string) string
+	// OnMessage 收到消息时的回调
+	// 参数: sender - 发送者, content - 消息内容
+	OnMessage func(sender, content string)
+	// OnReply 发送回复时的回调
+	// 参数: sender - 发送者, reply - 回复内容
+	OnReply func(sender, reply string)
+	// OnError 发生错误时的回调
+	// 参数: err - 错误信息
+	OnError func(err error)
+}
+
 // Clear 清空所有会话记录
 func (sm *SessionManager) Clear() {
 	sm.sessions = make(map[string]*Session)
@@ -108,12 +246,12 @@ func (sm *SessionManager) Clear() {
 
 // MessageType 消息类型常量定义
 const (
-	MsgTypeText      = "文本"      // 文本消息
-	MsgTypeLink      = "链接"      // 链接消息
-	MsgTypeVoice     = "语音"      // 语音消息
+	MsgTypeText      = "文本"   // 文本消息
+	MsgTypeLink      = "链接"   // 链接消息
+	MsgTypeVoice     = "语音"   // 语音消息
 	MsgTypeVoiceCall = "语音通话" // 语音通话
-	MsgTypeVideo     = "视频"      // 视频消息
-	MsgTypeFile      = "文件"      // 文件消息
+	MsgTypeVideo     = "视频"   // 视频消息
+	MsgTypeFile      = "文件"   // 文件消息
 )
 
 // ParseMessageType 根据消息内容判断消息类型
